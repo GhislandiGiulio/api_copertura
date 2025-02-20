@@ -31,7 +31,7 @@ def __get_headers(city, province, street, address, number):
         f"{BASE_URL}/GetHeaders?city={city}&province={province}&street={street}&address={address}&number={number}",
         auth=HTTPBasicAuth(USERNAME, PASSWORD),
     )
-    if response.status_code == 200 and response.json()["Body"] != []:
+    if response.status_code == 200 and response.json()["Body"] != None:
         header_ids = [elem["IdHeader"] for elem in response.json()["Body"]]
         main_egon = response.json()["Body"][0]["CodiceEgon"]
         return header_ids, main_egon
@@ -73,10 +73,12 @@ def search(city_name, address, street, province, number):
         print("No Egon code found for the address.")
         return
 
-    header_ids, main_egon = __get_headers(city_name, province, street, address, number)
-    if not main_egon:
+    headers = __get_headers(city_name, province, street, address, number)
+    if not headers:
         print("No headers found for the address.")
         return
+    
+    header_ids, main_egon = headers
 
     coverage = __get_coverage(header_ids, city_egon, address_egon, main_egon, number)
 
