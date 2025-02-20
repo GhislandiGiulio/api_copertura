@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coverage Search</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #1e1e1e;
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
+        }
+        input, button {
+            margin: 5px;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        input {
+            background-color: #333;
+            color: #fff;
+        }
+        button {
+            background-color: #c70000;
+            color: #fff;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #cc000070;
+        }
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #292929;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #c70000;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #333;
+        }
+        tr:hover {
+            background-color: #444;
+        }
+        /* Legend Styling */
+        .legend {
+            text-align: left;
+            background-color: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
+            display: inline-block;
+        }
+        .legend h3 {
+            color: #c70000;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .legend ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .legend li {
+            margin-bottom: 5px;
+            line-height: 1.5;
+        }
+        .legend strong {
+            color: #c70000;
+        }
+        /* Form Styling */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+        }
+        .input-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .input-container label {
+            font-weight: bold;
+            color: #c70000;
+            flex: 1;
+            text-align: left;
+        }
+        .input-container input {
+            flex: 2;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #333;
+            color: white;
+            width: 100%;
+        }
+
+        /* Loading Spinner */
+        .loading-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(18, 18, 18, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #c70000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>    
+</head>
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+        <h1>Ricerca Copertura</h1>
+        <form id="searchForm" method="POST">
+            <div class="form-group">
+                <div class="input-container">
+                    <label for="city">Comune</label>
+                    <input type="text" id="city" name="city" required>
+                </div>
+
+                <div class="input-container">
+                    <label for="province">Provincia</label>
+                    <input type="text" id="province" name="province" required>
+                </div>
+
+                <div class="input-container">
+                    <label for="street">Tipo di strada</label>
+                    <input type="text" id="street" name="street" required>
+                </div>
+
+                <div class="input-container">
+                    <label for="address">Indirizzo</label>
+                    <input type="text" id="address" name="address" required>
+                </div>
+
+                <div class="input-container">
+                    <label for="number">Numero civico</label>
+                    <input type="text" id="number" name="number" required>
+                </div>
+            </div>
+
+            <br>
+            <button type="submit">Cerca</button>
+            <button type="submit" name="clear">Pulisci</button>
+        </form>
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="loading-container">
+            <div class="spinner"></div>
+        </div>
+
+        <!-- Legend Section -->
+        <div class="legend">
+            <h3>Legenda</h3>
+            <ul>
+                <li><strong>FWA (Fixed Wireless Access):</strong> Connessione internet tramite onde radio, ideale per zone non coperte dalla fibra ottica.</li>
+                <li><strong>FTTH (Fiber To The Home):</strong> Fibra ottica diretta fino a casa, garantisce la massima velocità e stabilità.</li>
+                <li><strong>FTTC (Fiber To The Cabinet):</strong> Fibra ottica fino all'armadio stradale, con l'ultimo tratto in rame.</li>
+                <li><strong>Fibra Dedicata:</strong> Connessione in fibra esclusiva per un singolo utente o azienda, con massime prestazioni.</li>
+            </ul>
+        </div>
+        
+        {% if data %}
+            <div>{{ data | safe }}</div>
+
+        {% elif error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+    </div>
+
+    <script>
+        document.getElementById("searchForm").addEventListener("submit", function() {
+            document.getElementById("loading").style.display = "flex";
+        });
+    </script>
+</body>
+</html>
