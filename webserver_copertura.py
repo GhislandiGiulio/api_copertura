@@ -15,7 +15,10 @@ def index():
             return render_template("index.html", logo_url="/static/logo.png")
         
         city_name = request.form["city"]
-        street, address = request.form["address"].split(" ", maxsplit=1)
+        try:
+           street, address = request.form["address"].split(" ", maxsplit=1)
+        except:
+            return render_template("index.html", error="Verifica i dati inseriti.", logo_url="/static/logo.png")
         province = request.form["province"]
         number = request.form["number"]
         
