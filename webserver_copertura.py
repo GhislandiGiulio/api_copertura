@@ -20,10 +20,10 @@ def index():
         province = request.form["province"]
         number = request.form["number"]
         
-        result = search(city_name, address, street, province, number)
-        
-        if result == "error":
-            return render_template("index.html", error="C'è stato un problema nella ricerca. Riprova più tardi.")
+        try:
+            result = search(city_name, address, street, province, number)
+        except:
+            return render_template("index.html", error="C'è stato un problema nella ricerca. Riprova più tardi", logo_url="/static/logo.png")
         
         if result is not None:
             return render_template("index.html", data=result.to_html(classes="table table-bordered", index=False), logo_url="/static/logo.png")
