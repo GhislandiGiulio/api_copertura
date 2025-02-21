@@ -63,45 +63,51 @@ def __extract_provider(provider_list):
 
 def search(city_name, address, street, province, number):
     
-    city_egon = __get_city_egon(city_name)
-    if not city_egon:
-        print("No Egon code found for the city.")
-        return
+    try:
+        city_egon = __get_city_egon(city_name)
+        if not city_egon:
+            print("No Egon code found for the city.")
+            return
 
-    address_egon = __get_address_egon(city_egon, address)
-    if not address_egon:
-        print("No Egon code found for the address.")
-        return
+        address_egon = __get_address_egon(city_egon, address)
+        if not address_egon:
+            print("No Egon code found for the address.")
+            return
 
-    headers = __get_headers(city_name, province, street, address, number)
-    if not headers:
-        print("No headers found for the address.")
-        return
-    
-    header_ids, main_egon = headers
+        headers = __get_headers(city_name, province, street, address, number)
+        if not headers:
+            print("No headers found for the address.")
+            return
+        
+        header_ids, main_egon = headers
 
-    coverage = __get_coverage(header_ids, city_egon, address_egon, main_egon, number)
+        coverage = __get_coverage(header_ids, city_egon, address_egon, main_egon, number)
 
-    availability_reports_json = __extract_reports(coverage)
-    
-    # Normalize the JSON data
-    availability_reports_table = json_normalize(availability_reports_json)
-    
-    # remove any useless column
-    selected_columns = ["MaxSpeed", "ServiceDescription", "FiberRange", "StatusCoverage"]
-    availability_reports_table = availability_reports_table[selected_columns]
-    
-    availability_reports_table = availability_reports_table.rename(columns={
-        "MaxSpeed": "Velocità Massima",
-        "ServiceDescription": "Tipo di Servizio",
-        "FiberRange": "Fascia",
-        "StatusCoverage": "Stato"
-    })
-    
-    availability_reports_table["Stato"] = availability_reports_table["Stato"].map({
-        True: "Attivo",
-        False: "Non attivo"
-    }).fillna("Unknown")
-    
-    # extract provider name
-    return availability_reports_table
+        availability_reports_json = __extract_reports(coverage)
+        
+        if availability_reports_json == []:
+            return
+        
+        # Normalize the JSON data
+        availability_reports_table = json_normalize(availability_reports_json)
+        
+        # remove any useless column
+        selected_columns = ["MaxSpeed", "ServiceDescription", "FiberRange", "StatusCoverage"]
+        availability_reports_table = availability_reports_table[selected_columns]
+        
+        availability_reports_table = availability_reports_table.rename(columns={
+            "MaxSpeed": "Velocità Massima",
+            "ServiceDescription": "Tipo di Servizio",
+            "FiberRange": "Fascia",
+            "StatusCoverage": "Stato"
+        })
+        
+        availability_reports_table["Stato"] = availability_reports_table["Stato"].map({
+            True: "Attivo",
+            False: "Non attivo"
+        }).fillna("Unknown")
+        
+        # extract provider name
+        return availability_reports_table
+    except:
+        return "errore"
