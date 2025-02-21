@@ -15,8 +15,7 @@ def index():
             return render_template("index.html", logo_url="/static/logo.png")
         
         city_name = request.form["city"]
-        address = request.form["address"]
-        street = request.form["street"]
+        street, address = request.form["address"].split(" ", maxsplit=1)
         province = request.form["province"]
         number = request.form["number"]
         
