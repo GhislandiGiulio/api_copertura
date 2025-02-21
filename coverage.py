@@ -6,8 +6,8 @@ from pandas import json_normalize
 
 dotenv.load_dotenv()
 
-USERNAME = os.environ["USER"]
-PASSWORD = os.environ["PASS"]
+USERNAME = os.environ["API_USERNAME"]
+PASSWORD = os.environ["API_PASSWORD"]
 
 BASE_URL = "https://reseller.twt.it/api/xdsl/toponomastica"
 
