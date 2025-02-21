@@ -192,6 +192,20 @@
             <div class="spinner"></div>
         </div>
 
+        {% if data %}
+        <div>{{ data | safe }}</div>
+
+            {% elif error %}
+                <p style="color: red;">{{ error }}</p>
+            {% endif %}
+        </div>
+
+        <script>
+            document.getElementById("searchForm").addEventListener("submit", function() {
+                document.getElementById("loading").style.display = "flex";
+            });
+        </script>
+
         <!-- Legend Section -->
         <div class="legend">
             <h3>Legenda</h3>
@@ -203,18 +217,6 @@
             </ul>
         </div>
         
-        {% if data %}
-            <div>{{ data | safe }}</div>
 
-        {% elif error %}
-            <p style="color: red;">{{ error }}</p>
-        {% endif %}
-    </div>
-
-    <script>
-        document.getElementById("searchForm").addEventListener("submit", function() {
-            document.getElementById("loading").style.display = "flex";
-        });
-    </script>
 </body>
 </html>
