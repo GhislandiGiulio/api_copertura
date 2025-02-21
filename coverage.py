@@ -93,8 +93,6 @@ def search(city_name, address, street, province, number):
     # remove any useless column
     selected_columns = ["MaxSpeed", "ServiceDescription", "FiberRange", "StatusCoverage"]
     
-    print(availability_reports_table)
-    
     availability_reports_table = availability_reports_table[selected_columns]
     
     availability_reports_table = availability_reports_table.rename(columns={
