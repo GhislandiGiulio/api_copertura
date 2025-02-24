@@ -1,1 +1,1 @@
-gunicorn --bind ADDRESS:PORT --workers (2*cores) + 1 wsgi:app
+gunicorn --bind ADDRESS:6443 --workers (2*cores) + 1 wsgi:app
