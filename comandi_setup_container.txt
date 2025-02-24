@@ -1,0 +1,29 @@
+PER ESEGUIRE CONTAINER
+
+git clone https://github.com/GhislandiGiulio/api_copertura.git
+cd docker_integration
+docker compose -p "webserver_copertura" up -d 
+
+DOPO ESECUZIONE CONTAINER
+PER BLOCCARE CONNESSIONI DIRETTE AL WEBSERVER
+
+sudo ufw allow from 127.0.0.1 to any port 6443
+sudo ufw deny from any to any port 6443
+
+
+DA AGGIUNGERE A NGINX
+
+server {
+    listen 443 ssl;
+    server_name cltrgoup.it;
+
+    ssl_certificate /etc/letsencrypt/live/cltgroup.it/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cltgroup.it/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:6443;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
