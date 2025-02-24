@@ -22,4 +22,4 @@ ENV API_PASSWORD=${API_PASSWORD}
 RUN pip install --no-cache-dir -r requirements.txt
 
 #  starting 
-CMD ["gunicorn", "--bind", "127.0.0.1:6443", "wsgi:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:6443", "wsgi:app"]
