@@ -13,7 +13,7 @@ BASE_URL = "https://reseller.twt.it/api/xdsl/toponomastica"
 
 def __get_city_egon(city_name):
     """Retrieve the Egon code for a city."""
-    response = requests.get(f"{BASE_URL}/GetCities?query={city_name}", auth=HTTPBasicAuth(USERNAME, PASSWORD))
+    response = requests.get(f"{BASE_URL}/GetCities?query={city_name}", auth=HTTPBasicAuth(USERNAME, PASSWORD), verify=False)
     if response.status_code == 200 and response.json()["Body"] != []:
         return response.json()["Body"][0]["IdCity"]  # Get first matching city ID
     return None
