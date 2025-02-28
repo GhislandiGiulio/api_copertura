@@ -24,7 +24,8 @@ def index():
         
         try:
             result = search(city_name, address, street, province, number)
-        except:
+        except Exception as e:
+            print(e)
             return render_template("index.html", error="C'è stato un problema nella ricerca. Riprova più tardi", logo_url="/static/logo.png")
         
         if result is not None:
