@@ -1,0 +1,14 @@
+services:
+  app:
+    container_name: webserver_copertura
+
+    build:
+      context: .
+      args:
+        API_USERNAME: "${API_USERNAME}"  # Passes the env var to build args
+        API_PASSWORD: "${API_PASSWORD}"  # Passes the env var to build args
+    environment:
+      - API_USERNAME=${API_USERNAME}
+      - API_PASSWORD=${API_PASSWORD}
+    ports:
+      - "127.0.0.1:6443:6443"  # Adjust based on your app
