@@ -3,6 +3,7 @@ from requests.auth import HTTPBasicAuth
 import dotenv
 import os
 from pandas import json_normalize
+import ssl
 
 dotenv.load_dotenv()
 
@@ -11,10 +12,18 @@ PASSWORD = os.environ["API_PASSWORD"]
 
 BASE_URL = "https://reseller.twt.it/api/xdsl/toponomastica"
 
+session = requests.Session()
+session.mount(
+    "https://",
+    requests.adapters.HTTPAdapter(
+        ssl_context=ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+    ),
+)
+
 def __get_city_egon(city_name):
     """Retrieve the Egon code for a city."""
     try:
-        response = requests.get(f"{BASE_URL}/GetCities?query={city_name}", auth=HTTPBasicAuth(USERNAME, PASSWORD))
+        response = session.get(f"{BASE_URL}/GetCities?query={city_name}", auth=HTTPBasicAuth(USERNAME, PASSWORD))
     except Exception as e:
         print(e)
         return None
@@ -26,7 +35,7 @@ def __get_city_egon(city_name):
 def __get_address_egon(city_egon, address):
     """Retrieve the Egon code for an address in a given city."""
     try:
-        response = requests.get(f"{BASE_URL}/GetAddressesByCity?query={address}&cityId={city_egon}", auth=HTTPBasicAuth(USERNAME, PASSWORD))
+        response = session.get(f"{BASE_URL}/GetAddressesByCity?query={address}&cityId={city_egon}", auth=HTTPBasicAuth(USERNAME, PASSWORD))
     except Exception as e:
         print(e)
         return None
@@ -38,7 +47,7 @@ def __get_address_egon(city_egon, address):
 def __get_headers(city, province, street, address, number):
     """Retrieve headers for a specific address."""
     try:
-        response = requests.get(
+        response = session.get(
             f"{BASE_URL}/GetHeaders?city={city}&province={province}&street={street}&address={address}&number={number}",
             auth=HTTPBasicAuth(USERNAME, PASSWORD),
         )
@@ -59,7 +68,7 @@ def __get_coverage(headers_id, city_egon, address_egon, main_egon, street_number
         f"&AddressEgon={address_egon}&MainEgon={main_egon}&StreetNumber={street_number}&Rule=1"
     )
     try:
-        response = requests.get(url, auth=HTTPBasicAuth(USERNAME, PASSWORD))
+        response = session.get(url, auth=HTTPBasicAuth(USERNAME, PASSWORD))
     except Exception as e:
         print(e)
         return None
