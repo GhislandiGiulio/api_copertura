@@ -4,17 +4,23 @@ import dotenv
 import os
 from pandas import json_normalize
 import ssl
+from urllib3 import PoolManager
+from requests.adapters import HTTPAdapter
 from urllib3.util.ssl_ import create_urllib3_context
 
-class TLSAdapter(requests.adapters.HTTPAdapter):
-    """A Transport Adapter that enforces TLS 1.2"""
+class TLSAdapter(HTTPAdapter):
+    """Custom adapter to force TLS 1.2 and lower security level."""
+    def __init__(self, ssl_context=None, **kwargs):
+        self.ssl_context = ssl_context or create_urllib3_context()
+        self.ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2  # Force TLS 1.2
+        self.ssl_context.set_ciphers("DEFAULT@SECLEVEL=1")  # Lower security level
+        super().__init__(**kwargs)
 
     def init_poolmanager(self, *args, **kwargs):
-        context = create_urllib3_context()
-        context.options |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1  # Disable old TLS versions
-        kwargs["ssl_context"] = context
-        super().init_poolmanager(*args, **kwargs)
+        kwargs["ssl_context"] = self.ssl_context
+        return super().init_poolmanager(*args, **kwargs)
 
+# Create a session and mount the adapter
 session = requests.Session()
 session.mount("https://", TLSAdapter())
 
