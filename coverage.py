@@ -3,6 +3,7 @@ from requests.auth import HTTPBasicAuth
 import dotenv
 import os
 from pandas import json_normalize
+"""
 import ssl
 from urllib3 import PoolManager
 from requests.adapters import HTTPAdapter
@@ -10,7 +11,6 @@ from urllib3.util.ssl_ import create_urllib3_context
 import certifi
 
 class TLSAdapter(HTTPAdapter):
-    """Custom adapter to force TLS 1.2 and lower security level."""
     def __init__(self, ssl_context=None, **kwargs):
         self.ssl_context = ssl_context or create_urllib3_context()
         self.ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2  # Force TLS 1.2
@@ -23,7 +23,7 @@ class TLSAdapter(HTTPAdapter):
 
 # Create a session and mount the adapter
 session = requests.Session()
-session.mount("https://", TLSAdapter())
+session.mount("https://", TLSAdapter())"""
 
 dotenv.load_dotenv()
 
@@ -35,7 +35,7 @@ BASE_URL = "https://reseller.twt.it/api/xdsl/toponomastica"
 def __get_city_egon(city_name):
     """Retrieve the Egon code for a city."""
     try:
-        response = session.get(f"{BASE_URL}/GetCities?query={city_name}", auth=HTTPBasicAuth(USERNAME, PASSWORD), verify=certifi.where())
+        response = requests.get(f"{BASE_URL}/GetCities?query={city_name}", auth=HTTPBasicAuth(USERNAME, PASSWORD), verify=False)
     except Exception as e:
         print(e)
         return None
@@ -47,7 +47,7 @@ def __get_city_egon(city_name):
 def __get_address_egon(city_egon, address):
     """Retrieve the Egon code for an address in a given city."""
     try:
-        response = session.get(f"{BASE_URL}/GetAddressesByCity?query={address}&cityId={city_egon}", auth=HTTPBasicAuth(USERNAME, PASSWORD), verify=certifi.where())
+        response = requests.get(f"{BASE_URL}/GetAddressesByCity?query={address}&cityId={city_egon}", auth=HTTPBasicAuth(USERNAME, PASSWORD), verify=False)
     except Exception as e:
         print(e)
         return None
@@ -59,10 +59,10 @@ def __get_address_egon(city_egon, address):
 def __get_headers(city, province, street, address, number):
     """Retrieve headers for a specific address."""
     try:
-        response = session.get(
+        response = requests.get(
             f"{BASE_URL}/GetHeaders?city={city}&province={province}&street={street}&address={address}&number={number}",
             auth=HTTPBasicAuth(USERNAME, PASSWORD),
-            verify=certifi.where()
+            verify=False
         )
     except Exception as e:
         print(e)
@@ -81,7 +81,7 @@ def __get_coverage(headers_id, city_egon, address_egon, main_egon, street_number
         f"&AddressEgon={address_egon}&MainEgon={main_egon}&StreetNumber={street_number}&Rule=1"
     )
     try:
-        response = session.get(url, auth=HTTPBasicAuth(USERNAME, PASSWORD), verify=certifi.where())
+        response = requests.get(url, auth=HTTPBasicAuth(USERNAME, PASSWORD), verify=False)
     except Exception as e:
         print(e)
         return None
