@@ -3,9 +3,12 @@ FROM python:3.12
 # Set the working directory inside the container
 WORKDIR /app
 
-# Install git
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/* && RUN apt-get update && apt-get install -y ca-certificates && update-ca-certificates
-
+# Update package lists and install required dependencies
+RUN apt-get update && \
+    apt-get install -y git ca-certificates && \
+    update-ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+    
 # Clone the GitHub repository
 COPY . /app 
 
