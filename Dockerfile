@@ -4,7 +4,7 @@ FROM python:3.12
 WORKDIR /app
 
 # Install git
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/* && RUN apt-get update && apt-get install -y ca-certificates && update-ca-certificates
 
 # Clone the GitHub repository
 COPY . /app 
