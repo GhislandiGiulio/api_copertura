@@ -8,6 +8,11 @@ from urllib3 import PoolManager
 from requests.adapters import HTTPAdapter
 from urllib3.util.ssl_ import create_urllib3_context
 import certifi
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 class TLSAdapter(HTTPAdapter):
     """Custom adapter to force TLS 1.2 and lower security level."""
@@ -37,11 +42,12 @@ def __get_city_egon(city_name):
     try:
         response = session.get(f"{BASE_URL}/GetCities?query={city_name}", auth=HTTPBasicAuth(USERNAME, PASSWORD), verify=certifi.where())
     except Exception as e:
-        print(e)
+        logger.error(f"Error fetching city Egon code: {e}")
         return None
     
     if response.status_code == 200 and response.json()["Body"] != []:
         return response.json()["Body"][0]["IdCity"]  # Get first matching city ID
+    logger.warning(f"No city found for {city_name}")
     return None
 
 def __get_address_egon(city_egon, address):
@@ -49,11 +55,12 @@ def __get_address_egon(city_egon, address):
     try:
         response = session.get(f"{BASE_URL}/GetAddressesByCity?query={address}&cityId={city_egon}", auth=HTTPBasicAuth(USERNAME, PASSWORD), verify=certifi.where())
     except Exception as e:
-        print(e)
+        logger.error(f"Error fetching address Egon code: {e}")
         return None
     
     if response.status_code == 200 and response.json()["Body"] != []:
         return response.json()["Body"][0]["CodiceEgon"]
+    logger.warning(f"No address found for {address} in city with Egon code {city_egon}")
     return None
 
 def __get_headers(city, province, street, address, number):
@@ -65,13 +72,14 @@ def __get_headers(city, province, street, address, number):
             verify=certifi.where()
         )
     except Exception as e:
-        print(e)
+        logger.error(f"Error fetching headers for {address}: {e}")
         return None
     
     if response.status_code == 200 and response.json()["Body"] != None:
         header_ids = [elem["IdHeader"] for elem in response.json()["Body"]]
         main_egon = response.json()["Body"][0]["CodiceEgon"]
         return header_ids, main_egon
+    logger.warning(f"No headers found for address {address}")
     return None
 
 def __get_coverage(headers_id, city_egon, address_egon, main_egon, street_number):
@@ -83,11 +91,12 @@ def __get_coverage(headers_id, city_egon, address_egon, main_egon, street_number
     try:
         response = session.get(url, auth=HTTPBasicAuth(USERNAME, PASSWORD), verify=certifi.where())
     except Exception as e:
-        print(e)
+        logger.error(f"Error fetching coverage for address {address_egon}: {e}")
         return None
     
     if response.status_code == 200 and response.json()["Body"] is not None:
         return response.json()
+    logger.warning(f"No coverage data for address {address_egon}")
     return None
 
 
@@ -104,20 +113,19 @@ def __extract_provider(provider_list):
     return None  # Return None if any part is missing
 
 def search(city_name, address, street, province, number):
-    
     city_egon = __get_city_egon(city_name)
     if not city_egon:
-        print("No Egon code found for the city.")
+        logger.warning("No Egon code found for the city.")
         return
 
     address_egon = __get_address_egon(city_egon, address)
     if not address_egon:
-        print("No Egon code found for the address.")
+        logger.warning("No Egon code found for the address.")
         return
 
     headers = __get_headers(city_name, province, street, address, number)
     if not headers:
-        print("No headers found for the address.")
+        logger.warning("No headers found for the address.")
         return
     
     header_ids, main_egon = headers
@@ -127,6 +135,7 @@ def search(city_name, address, street, province, number):
     availability_reports_json = __extract_reports(coverage)
     
     if availability_reports_json == []:
+        logger.info(f"No availability reports for {address}")
         return
     
     # Normalize the JSON data
