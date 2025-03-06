@@ -16,10 +16,10 @@ COPY . /app
 WORKDIR /app
 
 # Ask for API credentials as an environment variable
-ARG API_USERNAME
-ARG API_PASSWORD
-ENV API_USERNAME=${API_USERNAME}
-ENV API_PASSWORD=${API_PASSWORD}
+# ARG API_USERNAME
+# ARG API_PASSWORD
+# ENV API_USERNAME=${API_USERNAME}
+# ENV API_PASSWORD=${API_PASSWORD}
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt

@@ -8,6 +8,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.ssl_ import create_urllib3_context
 import certifi
 import logging
+import dotenv
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -28,6 +29,8 @@ class TLSAdapter(HTTPAdapter):
 # Create a session and mount the adapter
 session = requests.Session()
 session.mount("https://", TLSAdapter())
+
+_ = dotenv.load_dotenv()
 
 USERNAME = os.environ["API_USERNAME"]
 PASSWORD = os.environ["API_PASSWORD"]
