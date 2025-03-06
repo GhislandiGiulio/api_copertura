@@ -8,7 +8,7 @@ RUN apt-get update && \
     apt-get install -y git ca-certificates && \
     update-ca-certificates && \
     rm -rf /var/lib/apt/lists/*
-    
+
 # Clone the GitHub repository
 COPY . /app 
 
@@ -25,4 +25,4 @@ ENV API_PASSWORD=${API_PASSWORD}
 RUN pip install --no-cache-dir -r requirements.txt
 
 #  starting 
-CMD ["gunicorn", "--bind", "0.0.0.0:6443", "wsgi:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:6443", "webserver_copertura:app"]

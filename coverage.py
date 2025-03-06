@@ -1,6 +1,5 @@
 import requests
 from requests.auth import HTTPBasicAuth
-import dotenv
 import os
 from pandas import json_normalize
 import ssl
@@ -30,8 +29,6 @@ class TLSAdapter(HTTPAdapter):
 session = requests.Session()
 session.mount("https://", TLSAdapter())
 
-dotenv.load_dotenv()
-
 USERNAME = os.environ["API_USERNAME"]
 PASSWORD = os.environ["API_PASSWORD"]
 
@@ -48,7 +45,7 @@ def __get_city_egon(city_name):
     
     if response.status_code == 200 and response.json()["Body"] != []:
         return response.json()["Body"][0]["IdCity"]  # Get first matching city ID
-    logger.warning(f"No city found for {city_name}")
+    logger.warning(f"No city found for {city_name}, error {response.status_code}")
     return None
 
 def __get_address_egon(city_egon, address):
