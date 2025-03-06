@@ -39,6 +39,7 @@ BASE_URL = "https://reseller.twt.it/api/xdsl/toponomastica"
 
 def __get_city_egon(city_name):
     """Retrieve the Egon code for a city."""
+    logger.info(f"Getting Egon code for city: {city_name}")
     try:
         response = session.get(f"{BASE_URL}/GetCities?query={city_name}", auth=HTTPBasicAuth(USERNAME, PASSWORD), verify=certifi.where())
     except Exception as e:
