@@ -25,4 +25,4 @@ WORKDIR /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 #  starting 
-CMD ["gunicorn", "--bind", "0.0.0.0:6443", "webserver_copertura:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5443", "-w", "6", "webserver_copertura:app"]
