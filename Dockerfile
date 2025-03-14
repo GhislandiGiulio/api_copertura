@@ -3,6 +3,9 @@ FROM python:3.12
 # Set the working directory inside the container
 WORKDIR /app
 
+# setting time zone
+ENV TZ=Europe/Rome
+
 # Update package lists and install required dependencies
 RUN apt-get update && \
     apt-get install -y git ca-certificates && \
