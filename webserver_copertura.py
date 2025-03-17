@@ -45,7 +45,11 @@ def index():
         
         if result is not None:
             logger.info(f"Results found, rendering data.")
-            return render_template("index.html", data=result.to_html(classes="table table-bordered", index=False), logo_url="/static/logo.png")
+            return render_template(
+                "index.html", 
+                data=result.to_html(classes="table table-bordered", index=False), 
+                city_name=city_name, address=address, number=number,
+                logo_url="/static/logo.png")
         else:
             logger.warning("No results found. User may have entered incorrect data.")
             return render_template("index.html", error="Nessun risultato trovato. Controlla i dati inseriti.", logo_url="/static/logo.png")

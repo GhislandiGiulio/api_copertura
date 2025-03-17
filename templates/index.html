@@ -210,35 +210,38 @@
         </div>
 
         {% if data %}
+        <!-- Display the formatted message with address, number, and city -->
+        <h4>Risultati della tua ricerca per: </h4>
+        <h3>{{ address }} {{ number }}, {{ city_name }}</h3>
         <div>{{ data | safe }}</div>
 
-            {% elif error %}
-                <p style="color: red;">{{ error }}</p>
-            {% endif %}
-        </div>
+        {% elif error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+    </div>
 
-        <script>
-            document.getElementById("searchForm").addEventListener("submit", function() {
-                document.getElementById("loading").style.display = "flex";
-            });
-        </script>
+    <script>
+        document.getElementById("searchForm").addEventListener("submit", function() {
+            document.getElementById("loading").style.display = "flex";
+        });
+    </script>
 
-        <!-- Legend Section -->
-        <div class="legend">
-            <h3>Legenda</h3>
-            <ul>
-                <li><strong>FWA (Fixed Wireless Access):</strong> Connessione internet tramite onde radio, ideale per zone non coperte dalla fibra ottica.</li>
-                <li><strong>FTTH (Fiber To The Home):</strong> Fibra ottica diretta fino a casa, garantisce la massima velocità e stabilità.</li>
-                <li><strong>FTTC (Fiber To The Cabinet):</strong> Fibra ottica fino all'armadio stradale, con l'ultimo tratto in rame.</li>
-                <li><strong>Fibra Dedicata:</strong> Connessione in fibra esclusiva per un singolo utente o azienda, con massime prestazioni.</li>
-            </ul>
-        </div>
-        <footer class="footer">
-            <p>© 2025 CLT Group. Tutti i diritti sono riservati.</p>
-            <p>CLT Group Srl - Sede Legale: Via Volta, 29 27100 Pavia - P.IVA e C.F 02070570185</p>
-            <p>Rea PV: 243338 - ROC nr. 23356 - AS number 208900 - C.S. € 100.000,00 i.v.</p>
-            <p>Website created by <a href="https://www.linkedin.com/in/giulio-ghislandi/" target="_blank">Giulio</a></p>
-        </footer>        
+    <!-- Legend Section -->
+    <div class="legend">
+        <h3>Legenda</h3>
+        <ul>
+            <li><strong>FWA (Fixed Wireless Access):</strong> Connessione internet tramite onde radio, ideale per zone non coperte dalla fibra ottica.</li>
+            <li><strong>FTTH (Fiber To The Home):</strong> Fibra ottica diretta fino a casa, garantisce la massima velocità e stabilità.</li>
+            <li><strong>FTTC (Fiber To The Cabinet):</strong> Fibra ottica fino all'armadio stradale, con l'ultimo tratto in rame.</li>
+            <li><strong>Fibra Dedicata:</strong> Connessione in fibra esclusiva per un singolo utente o azienda, con massime prestazioni.</li>
+        </ul>
+    </div>
+    <footer class="footer">
+        <p>© 2025 CLT Group. Tutti i diritti sono riservati.</p>
+        <p>CLT Group Srl - Sede Legale: Via Volta, 29 27100 Pavia - P.IVA e C.F 02070570185</p>
+        <p>Rea PV: 243338 - ROC nr. 23356 - AS number 208900 - C.S. € 100.000,00 i.v.</p>
+        <p>Website created by <a href="https://www.linkedin.com/in/giulio-ghislandi/" target="_blank">Giulio</a></p>
+    </footer>        
 
 </body>
 </html>
