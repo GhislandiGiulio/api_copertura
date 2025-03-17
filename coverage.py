@@ -8,6 +8,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.ssl_ import create_urllib3_context
 import certifi
 import logging
+import json
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -34,7 +35,7 @@ PASSWORD = os.environ["API_PASSWORD"]
 
 BASE_URL = "https://reseller.twt.it/api/xdsl/toponomastica"
 
-def __get_city_egon(city_name):
+def __get_city_egon_and_province(city_name):
     """Retrieve the Egon code for a city."""
     logger.info(f"Getting Egon code for city: {city_name}")
     try:
@@ -44,7 +45,7 @@ def __get_city_egon(city_name):
         return None
     
     if response.status_code == 200 and response.json()["Body"] != []:
-        return response.json()["Body"][0]["IdCity"]  # Get first matching city ID
+        return response.json()["Body"][0]["IdCity"], response.json()["Body"][0]["Province"]
     logger.warning(f"No city found for {city_name}, error {response.status_code}")
     return None
 
@@ -61,11 +62,11 @@ def __get_address_egon(city_egon, address):
     logger.warning(f"No address found for {address} in city with Egon code {city_egon}")
     return None
 
-def __get_headers(city, province, street, address, number):
+def __get_headers(city, province, address, number):
     """Retrieve headers for a specific address."""
     try:
         response = session.get(
-            f"{BASE_URL}/GetHeaders?city={city}&province={province}&street={street}&address={address}&number={number}",
+            f"{BASE_URL}/GetHeaders?city={city}&province={province}&address={address}&number={number}",
             auth=HTTPBasicAuth(USERNAME, PASSWORD),
             verify=certifi.where()
         )
@@ -110,8 +111,8 @@ def __extract_provider(provider_list):
                 return coverage_details[0].get("Description", None)
     return None  # Return None if any part is missing
 
-def search(city_name, address, street, province, number):
-    city_egon = __get_city_egon(city_name)
+def search(city_name, address, number):
+    city_egon, province = __get_city_egon_and_province(city_name)
     if not city_egon:
         logger.warning("No Egon code found for the city.")
         return
@@ -121,7 +122,7 @@ def search(city_name, address, street, province, number):
         logger.warning("No Egon code found for the address.")
         return
 
-    headers = __get_headers(city_name, province, street, address, number)
+    headers = __get_headers(city_name, province, address, number)
     if not headers:
         logger.warning("No headers found for the address.")
         return

@@ -2,7 +2,10 @@ from flask import Flask, render_template, request, jsonify
 import pandas as pd
 from coverage import search
 import logging
+import json
 
+with open("static/prefissi.json", "r") as f:
+    prefissi = json.load(f)
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -13,28 +16,28 @@ app = Flask(__name__)
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        logger.info("POST request received for the index page.")
 
         if "clear" in request.form:
-            logger.info("Clear button pressed, resetting the form.")
             return render_template("index.html", logo_url="/static/logo.png")
         
         city_name = request.form["city"]
         try:
-            street, address = request.form["address"].split(" ", maxsplit=1)
-            logger.info(f"Received city: {city_name}, street: {street}, address: {address}")
+            address = request.form["address"].strip().split(" ")
+            
+            # checking if user mistakenly inserted prefix
+            if address[0].lower() in prefissi:
+                address = " ".join(address[1:])
+            else:
+                address = " ".join(address)
+            
         except Exception as e:
             logger.error(f"Error splitting address: {e}")
             return render_template("index.html", error="Verifica i dati inseriti.", logo_url="/static/logo.png")
         
-        province = request.form["province"]
         number = request.form["number"]
 
-        # Log the form data
-        logger.info(f"Received province: {province}, number: {number}")
-
         try:
-            result = search(city_name, address, street, province, number)
+            result = search(city_name, address, number)
             logger.info(f"Search completed for city: {city_name}, address: {address}, result found: {result is not None}")
         except Exception as e:
             logger.error(f"Error during search operation: {e}")
