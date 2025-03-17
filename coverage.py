@@ -38,6 +38,7 @@ BASE_URL = "https://reseller.twt.it/api/xdsl/toponomastica"
 def __get_city_egon_and_province(city_name):
     """Retrieve the Egon code for a city."""
     logger.info(f"Getting Egon code for city: {city_name}")
+    
     try:
         response = session.get(f"{BASE_URL}/GetCities?query={city_name}", auth=HTTPBasicAuth(USERNAME, PASSWORD), verify=certifi.where())
     except Exception as e:
@@ -45,12 +46,17 @@ def __get_city_egon_and_province(city_name):
         return None
     
     if response.status_code == 200 and response.json()["Body"] != []:
+    
+        logging.info(f"Found city EGON for {city_name}")
         return response.json()["Body"][0]["IdCity"], response.json()["Body"][0]["Province"]
+    
     logger.warning(f"No city found for {city_name}, error {response.status_code}")
     return None
 
 def __get_address_egon(city_egon, address):
     """Retrieve the Egon code for an address in a given city."""
+    logger.info(f"Getting Egon code for address: {address}")
+    
     try:
         response = session.get(f"{BASE_URL}/GetAddressesByCity?query={address}&cityId={city_egon}", auth=HTTPBasicAuth(USERNAME, PASSWORD), verify=certifi.where())
     except Exception as e:
@@ -58,12 +64,17 @@ def __get_address_egon(city_egon, address):
         return None
     
     if response.status_code == 200 and response.json()["Body"] != []:
+        
+        logging.info(f"Found address EGON for {address}")
         return response.json()["Body"][0]["CodiceEgon"]
+    
     logger.warning(f"No address found for {address} in city with Egon code {city_egon}")
     return None
 
 def __get_headers(city, province, address, number):
     """Retrieve headers for a specific address."""
+    logger.info(f"Getting headers for address: {address}")
+    
     try:
         response = session.get(
             f"{BASE_URL}/GetHeaders?city={city}&province={province}&address={address}&number={number}",
@@ -77,6 +88,7 @@ def __get_headers(city, province, address, number):
     if response.status_code == 200 and response.json()["Body"] != None:
         header_ids = [elem["IdHeader"] for elem in response.json()["Body"]]
         main_egon = response.json()["Body"][0]["CodiceEgon"]
+        
         return header_ids, main_egon
     logger.warning(f"No headers found for address {address}")
     return None
@@ -94,7 +106,9 @@ def __get_coverage(headers_id, city_egon, address_egon, main_egon, street_number
         return None
     
     if response.status_code == 200 and response.json()["Body"] is not None:
+
         return response.json()
+
     logger.warning(f"No coverage data for address {address_egon}")
     return None
 
@@ -112,6 +126,9 @@ def __extract_provider(provider_list):
     return None  # Return None if any part is missing
 
 def search(city_name, address, number):
+    
+    logging.info("Starting search for city: %s, address: %s, number: %s", city_name, address, number)
+    
     city_egon, province = __get_city_egon_and_province(city_name)
     if not city_egon:
         logger.warning("No Egon code found for the city.")
