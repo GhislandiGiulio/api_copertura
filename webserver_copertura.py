@@ -1,12 +1,8 @@
 from flask import Flask, render_template, request, jsonify
-import os
-import dotenv
 import pandas as pd
 from coverage import search
 import logging
 
-# Load environment variables from .env file
-dotenv.load_dotenv()
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
